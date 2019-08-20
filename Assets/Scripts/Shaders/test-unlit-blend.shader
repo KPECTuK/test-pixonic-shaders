@@ -18,6 +18,8 @@
 			#pragma vertex vert
 			#pragma fragment frag
 
+			#pragma target 3.0
+
 			#include "UnityCG.cginc"
 			#include "blend.cginc"
 
@@ -25,31 +27,28 @@
 			{
 				float4 vertex : POSITION;
 				float2 uv : TEXCOORD0;
-				float4 color : color0;
+				float4 color : COLOR;
 			};
 
 			struct v2f
 			{
 				float4 vertex : SV_POSITION;
 				float2 uv : TEXCOORD0;
-				float4 color : COLOR0;
+				float4 color : COLOR;
 			};
 
 			sampler2D _blend_00;
 			float4 _blend_00_ST;
 			sampler2D _blend_01;
-			float4 _blend_01_ST;
 			sampler2D _blend_02;
-			float4 _blend_02_ST;
 			sampler2D _blend_03;
-			float4 _blend_03_ST;
 
 			v2f vert (appdata v)
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _blend_00);
-				o.color = normalize(v.color);
+				o.color = saturate(v.color);
 				return o;
 			}
 
@@ -59,7 +58,8 @@
 				float4 b1 = tex2D(_blend_01, i.uv);
 				float4 b2 = tex2D(_blend_02, i.uv);
 				float4 b3 = tex2D(_blend_03, i.uv);
-				return BlendMtx(b0, b1, b2, b3, i.color);
+				float4 col = BlendMtx(b0, b1, b2, b3, i.color);
+				return col;
 			}
 			ENDCG
 		}
